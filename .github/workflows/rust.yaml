@@ -1,0 +1,91 @@
+# SPDX-FileCopyrightText: 2024 Jonas Fierlings <fnoegip@gmail.com>
+#
+# SPDX-License-Identifier: Apache-2.0 OR MIT
+
+name: Rust CI/CD
+
+on:
+  merge_group:
+  pull_request:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+env:
+  CARGO_INCREMENTAL: 0
+  CARGO_TERM_COLOR: always
+  CLICOLOR: 1
+  COLUMNS: 130
+  RUST_BACKTRACE: short
+  RUSTDOCFLAGS: -D warnings
+  RUSTFLAGS: -D warnings
+
+jobs:
+  # A single job that can be used for the branch protection rules.
+  # See: https://github.com/orgs/community/discussions/4324
+  ci:
+    permissions:
+      contents: none
+    name: CI
+    needs:
+      - test
+      - msrv
+      - lint
+    runs-on: ubuntu-24.04
+    if: always()
+    steps:
+      - name: Failed
+        run: exit 1
+        if: contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled') || contains(needs.*.result, 'skipped')
+
+  test:
+    name: Test code
+    strategy:
+      matrix:
+        os:
+          - ubuntu-24.04
+        rust:
+          - stable
+    continue-on-error: ${{ matrix.rust != 'stable' }}
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: ${{ matrix.rust }}
+      - uses: Swatinem/rust-cache@v2
+      - uses: taiki-e/install-action@cargo-hack
+      - name: Build
+        run: cargo test --workspace --locked --no-run --all-targets
+      - name: Test
+        run: cargo hack test --workspace --locked  --feature-powerset --no-fail-fast
+
+  msrv:
+    name: Check Minimum Supported Rust Version
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: stable
+      - uses: Swatinem/rust-cache@v2
+      - uses: taiki-e/install-action@cargo-hack
+      # https://github.com/taiki-e/cargo-hack#--rust-version
+      - run: cargo hack check --workspace --locked --feature-powerset --rust-version --all-targets
+
+  lint:
+    name: Lint code
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: stable
+          components: clippy, rustfmt
+      - uses: Swatinem/rust-cache@v2
+      - run: cargo clippy --workspace --locked --all-features --all-targets
+      - run: cargo fmt --all --check
+      - run: cargo doc --workspace --locked --all-features --no-deps --document-private-items
