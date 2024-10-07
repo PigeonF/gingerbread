@@ -11,4 +11,7 @@ ASEPRITEFLAGS=
 .aseprite.png:
 	$(ASEPRITE) $(ASEPRITEFLAGS) --batch $< --save-as $@
 
+gingerbread:
+	cargo build
+
 docs/logo/gingerbread.png: docs/logo/gingerbread.aseprite
