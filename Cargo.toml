@@ -1,0 +1,25 @@
+# SPDX-FileCopyrightText: 2024 Jonas Fierlings <fnoegip@gmail.com>
+#
+# SPDX-License-Identifier: CC0-1.0
+
+[workspace]
+resolver = "2"
+members = ["crates/*"]
+default-members = ["crates/gingerbread"]
+
+[workspace.package]
+authors = ["Jonas Fierlings <fnoegip@gmail.com>"]
+documentation = "https://github.com/PigeonF/gingerbread"
+edition = "2021"
+homepage = "https://github.com/PigeonF/gingerbread"
+license = "Apache-2.0 OR MIT"
+publish = false
+repository = "https://github.com/PigeonF/gingerbread.git"
+rust-version = "1.81.0"
+
+[workspace.lints]
+
+[workspace.dependencies]
+
+# Local crates
+gingerbread = { path = "crates/gingerbread" }
