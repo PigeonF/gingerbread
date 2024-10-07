@@ -1,0 +1,22 @@
+# SPDX-FileCopyrightText: 2024 Jonas Fierlings <fnoegip@gmail.com>
+#
+# SPDX-License-Identifier: Apache-2.0 OR MIT
+---
+name: Repository Tests
+
+on:
+  merge_group:
+  pull_request:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  reuse:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: fsfe/reuse-action@v4
