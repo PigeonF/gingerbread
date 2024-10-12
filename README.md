@@ -10,7 +10,7 @@ SPDX-License-Identifier: CC-BY-4.0
 
 </center>
 
-_Gingerbread_ is my attempt at solving the [Advent of Code puzlles][aoc].
+_Gingerbread_ is my attempt at solving the [Advent of Code puzzles][aoc].
 The focus is on exploring multiple solutions to the same puzzle,
 and comparing the different solutions with microbenchmarks.
 
